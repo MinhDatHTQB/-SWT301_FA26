@@ -5,33 +5,26 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Account {
-    private String username;
-    private String email;
-    private LocalDate dateOfBirth;
-    private String phone;
-    private String salt;
-    private AccountStatus status;
+    private final String username;
+    private final String email;
+    private final LocalDate dateOfBirth;
+    private final String phone;
+    private final String salt;
+    private final List<String> passwordHistory = new ArrayList<>(); // phần tử cuối = mật khẩu hiện tại
+    private AccountStatus status = AccountStatus.ACTIVE;
     private int failedAttempts;
     private boolean locked;
-    private List<String> passwordHistory;
 
-    public Account(String username, String email, LocalDate dateOfBirth, String phone,
-                   String salt, String initialPasswordHash, AccountStatus status) {
+    Account(String username, String email, LocalDate dateOfBirth, String phone,
+            String salt, String passwordHash) {
         this.username = username;
         this.email = email;
         this.dateOfBirth = dateOfBirth;
         this.phone = phone;
         this.salt = salt;
-        this.status = status;
-        this.failedAttempts = 0;
-        this.locked = false;
-        this.passwordHistory = new ArrayList<>();
-        if (initialPasswordHash != null) {
-            this.passwordHistory.add(initialPasswordHash);
-        }
+        this.passwordHistory.add(passwordHash);
     }
 
-    // Public Getters
     public String getUsername() { return username; }
     public String getEmail() { return email; }
     public LocalDate getDateOfBirth() { return dateOfBirth; }
@@ -42,7 +35,6 @@ public class Account {
     public boolean isLocked() { return locked; }
 
     public String getCurrentPasswordHash() {
-        if (passwordHistory == null || passwordHistory.isEmpty()) return null;
         return passwordHistory.get(passwordHistory.size() - 1);
     }
 
@@ -50,17 +42,22 @@ public class Account {
         return List.copyOf(passwordHistory);
     }
 
-    // Package-private state changers
+    // ----- package-private: thay đổi trạng thái -----
+    void setStatus(AccountStatus status) { this.status = status; }
     void incrementFailedAttempts() { failedAttempts++; }
     void resetFailedAttempts() { failedAttempts = 0; }
     void lock() { locked = true; }
-    void unlock() { locked = false; failedAttempts = 0; }
-    void setStatus(AccountStatus s) { status = s; }
-    void setSalt(String salt) { this.salt = salt; }
-    void addPasswordHash(String hash) {
-        if (this.passwordHistory == null) {
-            this.passwordHistory = new ArrayList<>();
+
+    void unlock() {
+        locked = false;
+        failedAttempts = 0;
+    }
+
+    /** Thêm băm mới vào lịch sử, chỉ giữ tối đa maxHistory phần tử (bỏ phần tử cũ nhất). */
+    void changePasswordHash(String newHash, int maxHistory) {
+        passwordHistory.add(newHash);
+        while (passwordHistory.size() > maxHistory) {
+            passwordHistory.remove(0);
         }
-        this.passwordHistory.add(hash);
     }
 }
