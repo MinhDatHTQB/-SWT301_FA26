@@ -1,5 +1,10 @@
-package minhdatqb.example;
+package minhdatqb;
 
+import minhdatqb.example.Account;
+import minhdatqb.example.AccountService;
+import minhdatqb.example.AccountStatus;
+import minhdatqb.example.ResultCode;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -46,7 +51,7 @@ class AccountServiceTest {
             assertNotNull(account);
             assertEquals(VALID_USER, account.getUsername());
             assertEquals(VALID_EMAIL.toLowerCase(), account.getEmail()); // Đảm bảo email lưu lowercase
-            assertEquals(AccountStatus.ACTIVE, account.getStatus());
+            Assertions.assertEquals(AccountStatus.ACTIVE, account.getStatus());
             assertEquals(0, account.getFailedAttempts());
             assertFalse(account.isLocked());
 
@@ -56,7 +61,7 @@ class AccountServiceTest {
         }
 
         @ParameterizedTest(name = "[{index}] {0}")
-        @MethodSource("minhdatqb.example.AccountServiceTest#invalidRegisterInputs")
+        @MethodSource("minhdatqb.AccountServiceTest#invalidRegisterInputs")
         void register_InvalidInput_ReturnsExpectedCode(String desc, String u, String e, String p, String c,
                                                        LocalDate dob, String phone, ResultCode expected) {
             assertEquals(expected, service.register(u, e, p, c, dob, phone));

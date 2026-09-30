@@ -1,6 +1,7 @@
-package example;
+package minhdatqb;
 
 import minhdatqb.example.AccountValidator;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.CsvSource;
@@ -18,7 +19,7 @@ class AccountValidatorTest {
     @ParameterizedTest(name = "[{index}] username hợp lệ: {0}")
     @ValueSource(strings = {"alice", "Alice_01", "Z____"})
     void isValidUsername_Valid(String username) {
-        assertEquals(true, AccountValidator.isValidUsername(username));
+        Assertions.assertEquals(true, AccountValidator.isValidUsername(username));
     }
 
     @ParameterizedTest(name = "[{index}] username không hợp lệ: {0}")
